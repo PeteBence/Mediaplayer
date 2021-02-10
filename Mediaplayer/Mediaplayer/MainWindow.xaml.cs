@@ -14,23 +14,30 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.Windows.Controls.Primitives;
+using System.IO;
 using System.Windows.Threading;
 
 namespace Mediaplayer
 {
-  
+
     public partial class MainWindow : Window
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+
+
         MediaPlayer mediaPlayer = new MediaPlayer();
         DispatcherTimer timer = new DispatcherTimer();
         string fajlnev;
         private bool mediaPlayerIsPlaying = false;
         private bool userIsDraggingSlider = false;
+        int isPlaying = 0;
+        int playing = -1;
+        int repeatType = 0;
 
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+       
 
         private void betoltes_Click(object sender, RoutedEventArgs e)
         {
@@ -39,7 +46,6 @@ namespace Mediaplayer
                 Multiselect = true,
                 DefaultExt = ".mp3"
             };
-            bool? dialog = filedialog.ShowDialog();
             {
 
                 fajlnev = filedialog.FileName;
@@ -98,5 +104,38 @@ namespace Mediaplayer
             lblProgressStatus.Text = TimeSpan.FromSeconds(sliProgress.Value).ToString(@"hh\:mm\:ss");
         }
 
+        private void box_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void Previous_Click(object sender, RoutedEventArgs e)
+        {
+            playing = playing - 1;
+            box.SelectedText = playing;
+            string file = box.Items[box.SelectedText].ToString();
+            mediaPlayer.Open(new Uri(file));
+            mediaPlayer.Play();
+            isPlaying = 2;
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += timer_Tick;
+            timer.Start();
+            sliProgress.IsEnabled = true;
+        }
+
+        private void Next_Click(object sender, RoutedEventArgs e)
+        {
+            playing++;
+            box.SelectedText = playing;
+            string file = box.Items[box.SelectedText].ToString();
+            mediaPlayer.Open(new Uri(file));
+            mediaPlayer.Play();
+            isPlaying = 2;
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += timer_Tick;
+            timer.Start();
+            sliProgress.IsEnabled = true;
+
+        }
     }
 }
